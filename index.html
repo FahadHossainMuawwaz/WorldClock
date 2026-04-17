@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>World Clock - All Countries</title>
+
+<style>
+body {
+  background: #0f172a;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+}
+
+#search {
+  margin-top: 20px;
+  padding: 10px;
+  width: 300px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.clock {
+  background: #1e293b;
+  padding: 12px;
+  border-radius: 10px;
+  width: 180px;
+}
+
+.clock h3 {
+  font-size: 14px;
+}
+
+.clock p {
+  font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>World Clock</h1>
+
+<input type="text" id="search" placeholder="Search country...">
+
+<div class="container" id="container"></div>
+
+<script>
+// FULL COUNTRY LIST (ISO-based)
+const countries = [
+"Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan",
+"Bahrain","Bangladesh","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana",
+"Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Chad","Chile",
+"China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark",
+"Djibouti","Dominican Republic","Ecuador","Egypt","El Salvador","Estonia","Ethiopia","Fiji","Finland","France",
+"Gabon","Gambia","Georgia","Germany","Ghana","Greece","Guatemala","Guinea","Guyana","Haiti",
+"Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy",
+"Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon",
+"Libya","Lithuania","Luxembourg","Madagascar","Malaysia","Maldives","Mali","Malta","Mauritania","Mexico",
+"Moldova","Mongolia","Morocco","Mozambique","Myanmar","Namibia","Nepal","Netherlands","New Zealand","Nicaragua",
+"Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Panama","Paraguay","Peru","Philippines",
+"Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saudi Arabia","Senegal","Serbia","Singapore",
+"Slovakia","Slovenia","Somalia","South Africa","South Korea","Spain","Sri Lanka","Sudan","Sweden","Switzerland",
+"Syria","Taiwan","Tajikistan","Tanzania","Thailand","Tunisia","Turkey","Turkmenistan","Uganda","Ukraine",
+"United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
+];
+
+// SIMPLE TIMEZONE MAP (core mapping)
+const timezoneMap = {
+"Bangladesh":"Asia/Dhaka",
+"United States":"America/New_York",
+"United Kingdom":"Europe/London",
+"India":"Asia/Kolkata",
+"Iran":"Asia/Tehran",
+"Pakistan":"Asia/Karachi",
+"Australia":"Australia/Sydney",
+"Canada":"America/Toronto",
+"Germany":"Europe/Berlin",
+"France":"Europe/Paris",
+"Brazil":"America/Sao_Paulo",
+"Russia":"Europe/Moscow",
+"China":"Asia/Shanghai",
+"Japan":"Asia/Tokyo",
+"South Africa":"Africa/Johannesburg",
+"Saudi Arabia":"Asia/Riyadh",
+"UAE":"Asia/Dubai"
+};
+
+// default fallback
+function getTimezone(country) {
+  return timezoneMap[country] || "UTC";
+}
+
+// render
+function render(filter="") {
+  const container = document.getElementById("container");
+  container.innerHTML = "";
+
+  countries
+    .filter(c => c.toLowerCase().includes(filter.toLowerCase()))
+    .forEach((c, i) => {
+      const div = document.createElement("div");
+      div.className = "clock";
+      div.innerHTML = `
+        <h3>${c}</h3>
+        <p id="t${i}"></p>
+      `;
+      container.appendChild(div);
+    });
+}
+
+// update
+function update() {
+  countries.forEach((c,i)=>{
+    const el = document.getElementById(`t${i}`);
+    if(el){
+      el.innerText = new Intl.DateTimeFormat("en-US",{
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit",
+        hour12:true,
+        timeZone:getTimezone(c)
+      }).format(new Date());
+    }
+  });
+}
+
+// search
+document.getElementById("search").addEventListener("input",(e)=>{
+  render(e.target.value);
+});
+
+// init
+render();
+setInterval(update,1000);
+update();
+</script>
+
+</body>
+</html>

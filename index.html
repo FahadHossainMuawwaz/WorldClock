@@ -55,7 +55,6 @@ body {
 <div class="container" id="container"></div>
 
 <script>
-// FULL COUNTRY LIST (ISO-based)
 const countries = [
 "Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan",
 "Bahrain","Bangladesh","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana",
@@ -74,7 +73,7 @@ const countries = [
 "United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
 ];
 
-// SIMPLE TIMEZONE MAP (core mapping)
+
 const timezoneMap = {
 "Bangladesh":"Asia/Dhaka",
 "United States":"America/New_York",
@@ -92,57 +91,61 @@ const timezoneMap = {
 "Japan":"Asia/Tokyo",
 "South Africa":"Africa/Johannesburg",
 "Saudi Arabia":"Asia/Riyadh",
-"UAE":"Asia/Dubai"
+"United Arab Emirates":"Asia/Dubai"
 };
 
-// default fallback
 function getTimezone(country) {
   return timezoneMap[country] || "UTC";
 }
 
-// render
+function getSafeId(countryName) {
+  return "time-" + countryName.replace(/\s+/g, '-');
+}
+
 function render(filter="") {
   const container = document.getElementById("container");
   container.innerHTML = "";
 
   countries
     .filter(c => c.toLowerCase().includes(filter.toLowerCase()))
-    .forEach((c, i) => {
+    .forEach(c => {
       const div = document.createElement("div");
       div.className = "clock";
       div.innerHTML = `
         <h3>${c}</h3>
-        <p id="t${i}"></p>
+        <p id="${getSafeId(c)}"></p> 
       `;
       container.appendChild(div);
     });
+    
+  update(); 
 }
 
-// update
 function update() {
-  countries.forEach((c,i)=>{
-    const el = document.getElementById(`t${i}`);
+  countries.forEach(c => {
+    const el = document.getElementById(getSafeId(c)); // Find element by country name, not index
     if(el){
-      el.innerText = new Intl.DateTimeFormat("en-US",{
-        hour:"2-digit",
-        minute:"2-digit",
-        second:"2-digit",
-        hour12:true,
-        timeZone:getTimezone(c)
-      }).format(new Date());
+      try {
+        el.innerText = new Intl.DateTimeFormat("en-US",{
+          hour:"2-digit",
+          minute:"2-digit",
+          second:"2-digit",
+          hour12:true,
+          timeZone:getTimezone(c)
+        }).format(new Date());
+      } catch (e) {
+        el.innerText = "Invalid Timezone";
+      }
     }
   });
 }
 
-// search
 document.getElementById("search").addEventListener("input",(e)=>{
   render(e.target.value);
 });
 
-// init
 render();
-setInterval(update,1000);
-update();
+setInterval(update, 1000);
 </script>
 
 </body>
